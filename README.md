@@ -5,6 +5,9 @@ This Python script downloads One Piece Digital Colored Comics chapters, processe
 - Downloads chapters from the specified range.
 - Splits landscape images into multiple pages.
 - Creates one EPUB file per chapter.
+ 
+## Planned Features
+As the repository name suggest, I plan to make this script more generic in the close future, allowing users to input their own sources and url patterns so it can be used for different mangas.
 
 ## Installation
 
@@ -42,6 +45,3 @@ python one_piece_epub.py 100 105
 ```
 
 This will download chapters 100 to 105, process the images, and create EPUB files in the `output` directory.
-
-## Planned Features
-As the repository name suggest, I plan to make this script more generic in the close future, allowing users to input their own sources and url patterns so it can be used for different mangas.
