@@ -3,7 +3,6 @@ import requests
 from bs4 import BeautifulSoup
 import argparse
 import subprocess
-import sys
 from lxml import etree
 from html import escape
 from uuid import uuid4
@@ -31,6 +30,10 @@ def download_images_from_url(url, directory):
     # Download each image
     for img in img_tags:
         img_url = img['src']
+
+        # Remove potential broken query parameters from the URL
+        img_url = img_url.split('?')[0]
+
         if img_url.endswith(('.jpg', '.jpeg')):
             # Get the image file name
             img_name = os.path.basename(img_url)
@@ -45,13 +48,12 @@ def download_images_from_url(url, directory):
 
 
 # Function to scrape and download images
-def scrape_images(start_chapter, end_chapter):
+def scrape_images(chapter):
     base_url = "https://ww10.readonepiece.com/chapter/one-piece-digital-colored-comics-chapter-"
-    for chapter in range(start_chapter, end_chapter + 1):
-        url = f"{base_url}{chapter}/"
-        directory = f"scraped/one-piece-colored-{chapter}"
-        print(f"Downloading images for chapter {chapter}...")
-        download_images_from_url(url, directory)
+    url = f"{base_url}{chapter}/"
+    directory = f"scraped/one-piece-colored-{chapter}"
+    print(f"Downloading images for chapter {chapter}...")
+    download_images_from_url(url, directory)
 
 
 # Function to split landscape images
@@ -169,7 +171,7 @@ body {
         for i, img in enumerate(imageFiles):
             uid = UID_FORMAT.format(i)
             props = 'page-spread-left' if (i % 2 == 0 and direction == 'ltr') or (
-                        i % 2 != 0 and direction == 'rtl') else 'page-spread-right'
+                    i % 2 != 0 and direction == 'rtl') else 'page-spread-right'
             etree.SubElement(spine, 'itemref', {'idref': f'page-{uid}', 'properties': props})
         return etree.tostring(root, pretty_print=True, encoding='utf-8', xml_declaration=True)
 
@@ -222,7 +224,7 @@ body {
                          os.path.isfile(os.path.join(directory, f)) and os.path.splitext(f)[1][1:] in IMAGE_TYPES])
     if len(imageFiles) < 1:
         print('Too few images:', len(imageFiles))
-        sys.exit(1)
+        return
 
     prev_compression = zipfile.zlib.Z_DEFAULT_COMPRESSION
     zipfile.zlib.Z_DEFAULT_COMPRESSION = 9
@@ -249,7 +251,7 @@ body {
     output_zip.close()
     zipfile.zlib.Z_DEFAULT_COMPRESSION = prev_compression
 
-    print('Complete! Saved EPUB as ' + output)
+    print('Complete! Saved EPUB as ' + output, flush=True)
 
 
 # Main function to handle argument parsing and execution
@@ -265,11 +267,11 @@ def main():
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    scrape_images(args.start_chapter, args.end_chapter)
-
     for chapter in range(args.start_chapter, args.end_chapter + 1):
+        print(f"Scraping images for chapter {chapter}...", flush=True)
+        scrape_images(chapter)
         directory = f"scraped/one-piece-colored-{chapter}"
-        print(f"Processing images for chapter {chapter}...")
+        print(f"Processing images for chapter {chapter}...", flush=True)
         split_landscape_images(directory)
 
         title = f"One Piece Colored {chapter}"
