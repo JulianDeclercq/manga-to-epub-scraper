@@ -41,7 +41,7 @@ def main(start_chapter, end_chapter):
     base_url = "https://ww10.readonepiece.com/chapter/one-piece-digital-colored-comics-chapter-"
     for chapter in range(start_chapter, end_chapter + 1):
         url = f"{base_url}{chapter}/"
-        directory = f"one-piece-colored-{chapter}"
+        directory = f"scraped/one-piece-colored-{chapter}"
         print(f"Downloading images for chapter {chapter}...")
         download_images_from_url(url, directory)
 
