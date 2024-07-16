@@ -221,16 +221,29 @@ body {
   </body>
 </html>'''
 
-    # Function to extract the numerical part from the file name
-    def extract_number(filename):
+    # Function to extract parts from the filename
+    def extract_parts(filename):
         match = re.search(r'(\d+)(_?[0-1])?\.', filename)
         if match:
-            return int(match.group(1))
-        return -1
+            num_part = int(match.group(1))
+            sub_part = match.group(2)
+            if sub_part:
+                sub_part = int(sub_part.replace('_', ''))
+            else:
+                sub_part = -1  # Use -1 for filenames without _0 or _1
+            return num_part, sub_part
+        return -1, -1  # Use -1, -1 for filenames that don't match the pattern
+
+    # Function to sort the filenames
+    def sort_files(filenames):
+        reverse = direction == 'rtl'
+        return sorted(filenames,
+                      key=lambda f: (extract_parts(f)[0], -extract_parts(f)[1] if reverse else extract_parts(f)[1]))
 
     imageFiles = sorted([f for f in os.listdir(directory) if
-                         os.path.isfile(os.path.join(directory, f)) and os.path.splitext(f)[1][1:] in IMAGE_TYPES],
-                        key=extract_number)
+                         os.path.isfile(os.path.join(directory, f)) and os.path.splitext(f)[1][1:] in IMAGE_TYPES])
+
+    imageFiles = sort_files(imageFiles)
 
     if len(imageFiles) < 1:
         print('Too few images:', len(imageFiles))
