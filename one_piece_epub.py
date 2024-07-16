@@ -35,7 +35,7 @@ def download_images_from_url(url, directory):
         # Remove potential broken query parameters from the URL
         img_url = img_url.split('?')[0]
 
-        if img_url.endswith(('.jpg', '.jpeg')):
+        if img_url.endswith(('.jpg', '.jpeg', '.png')):
             # Get the image file name
             img_name = os.path.basename(img_url)
             img_path = os.path.join(directory, img_name)
