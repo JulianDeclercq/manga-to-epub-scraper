@@ -281,6 +281,8 @@ def main():
         description='Download, process, and convert One Piece Digital Colored Comics chapters into EPUB format.')
     parser.add_argument('start_chapter', type=int, help='The starting chapter number (inclusive)')
     parser.add_argument('end_chapter', type=int, help='The ending chapter number (inclusive)')
+    parser.add_argument('-d', '--dir', '--direction', choices=['ltr', 'rtl'], default='rtl',
+                        help='The direction for sorting and processing images (default: rtl)')
 
     args = parser.parse_args()
 
@@ -299,7 +301,7 @@ def main():
         author = "Eiichiro Oda"
 
         output_file = os.path.join(output_dir, f"one_piece_colored_{chapter}.epub")
-        create_epub(directory, output_file, title, author)
+        create_epub(directory, output_file, title, author, args.dir)
 
 
 if __name__ == "__main__":
