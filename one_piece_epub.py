@@ -1,4 +1,5 @@
 ﻿import os
+import re
 import requests
 from bs4 import BeautifulSoup
 import argparse
@@ -220,11 +221,23 @@ body {
   </body>
 </html>'''
 
+    # Function to extract the numerical part from the file name
+    def extract_number(filename):
+        match = re.search(r'(\d+)(_?[0-1])?\.', filename)
+        if match:
+            return int(match.group(1))
+        return -1
+
     imageFiles = sorted([f for f in os.listdir(directory) if
-                         os.path.isfile(os.path.join(directory, f)) and os.path.splitext(f)[1][1:] in IMAGE_TYPES])
+                         os.path.isfile(os.path.join(directory, f)) and os.path.splitext(f)[1][1:] in IMAGE_TYPES],
+                        key=extract_number)
+
     if len(imageFiles) < 1:
         print('Too few images:', len(imageFiles))
         return
+
+    for i, img in enumerate(imageFiles):
+        print(f"image {img} on index {i} has name {img}")
 
     prev_compression = zipfile.zlib.Z_DEFAULT_COMPRESSION
     zipfile.zlib.Z_DEFAULT_COMPRESSION = 9
