@@ -29,6 +29,7 @@ def download_images_from_url(url, directory):
     img_tags = soup.find_all('img')
 
     # Download each image
+    has_pngs = False
     for img in img_tags:
         img_url = img['src']
 
@@ -45,7 +46,27 @@ def download_images_from_url(url, directory):
             with open(img_path, 'wb') as handler:
                 handler.write(img_data)
 
-    print(f"Finished downloading chapter {os.path.basename(directory)}.")
+            # Convert .png to .jpg for file size and performance on ereader
+            if img_url.endswith('.png'):
+                has_pngs = True
+
+                # Generate the converted image path
+                img_converted_path = os.path.splitext(img_path)[0] + '.jpg'
+
+                # Use ImageMagick to convert the image from PNG to JPG
+                result = subprocess.run(['magick', 'convert', img_path, img_converted_path], capture_output=True,
+                                        text=True)
+
+                if result.returncode == 0:
+                    # Remove the original PNG file
+                    os.remove(img_path)
+                else:
+                    print(f"ImageMagick conversion failed: {result.stderr}")
+
+    chapter = os.path.basename(directory)
+    print(f"Finished downloading chapter {chapter}.")
+    if has_pngs:
+        print(F"Converted png images to jpgs for chapter {chapter}")
 
 
 # Function to scrape and download images
@@ -241,7 +262,7 @@ body {
                       key=lambda f: (extract_parts(f)[0], -extract_parts(f)[1] if reverse else extract_parts(f)[1]))
 
     image_files = sort_files([f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))
-                             and os.path.splitext(f)[1][1:] in image_types])
+                              and os.path.splitext(f)[1][1:] in image_types])
 
     if len(image_files) < 1:
         print('Too few images:', len(image_files))
