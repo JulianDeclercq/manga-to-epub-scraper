@@ -240,17 +240,12 @@ body {
         return sorted(filenames,
                       key=lambda f: (extract_parts(f)[0], -extract_parts(f)[1] if reverse else extract_parts(f)[1]))
 
-    imageFiles = sorted([f for f in os.listdir(directory) if
-                         os.path.isfile(os.path.join(directory, f)) and os.path.splitext(f)[1][1:] in IMAGE_TYPES])
-
-    imageFiles = sort_files(imageFiles)
+    imageFiles = sort_files([f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))
+                             and os.path.splitext(f)[1][1:] in IMAGE_TYPES])
 
     if len(imageFiles) < 1:
         print('Too few images:', len(imageFiles))
         return
-
-    for i, img in enumerate(imageFiles):
-        print(f"image {img} on index {i} has name {img}")
 
     prev_compression = zipfile.zlib.Z_DEFAULT_COMPRESSION
     zipfile.zlib.Z_DEFAULT_COMPRESSION = 9
