@@ -75,18 +75,18 @@ def split_landscape_images(directory):
 
 # Function to create EPUB
 def create_epub(directory, output, title="Unknown Title", author="Unknown Author", direction="rtl"):
-    UID_FORMAT = '{:03d}'
-    NAMESPACES = {'OPF': 'http://www.idpf.org/2007/opf', 'DC': 'http://purl.org/dc/elements/1.1/'}
-    CONTAINER_PATH = 'META-INF/container.xml'
-    CONTAINER_XML = '''<?xml version='1.0' encoding='utf-8'?>
+    uid_format = '{:03d}'
+    namespaces = {'OPF': 'http://www.idpf.org/2007/opf', 'DC': 'http://purl.org/dc/elements/1.1/'}
+    container_path = 'META-INF/container.xml'
+    container_xml = '''<?xml version='1.0' encoding='utf-8'?>
 <container xmlns="urn:oasis:names:tc:opendocument:xmlns:container" version="1.0">
   <rootfiles>
     <rootfile media-type="application/oebps-package+xml" full-path="OEBPS/content.opf"/>
   </rootfiles>
 </container>
 '''
-    IBOOKS_DISPLAY_OPTIONS_PATH = 'META-INF/com.apple.ibooks.display-options.xml'
-    IBOOKS_DISPLAY_OPTIONS_XML = '''<?xml version="1.0" encoding="UTF-8"?>
+    ibooks_display_options_path = 'META-INF/com.apple.ibooks.display-options.xml'
+    ibooks_display_options_xml = '''<?xml version="1.0" encoding="UTF-8"?>
 <display_options>
   <platform name="*">
     <option name="fixed-layout">true</option>
@@ -94,7 +94,7 @@ def create_epub(directory, output, title="Unknown Title", author="Unknown Author
   </platform>
 </display_options>
 '''
-    IMAGESTYLE_CSS = '''
+    imagestyle_css = '''
 @page {
   padding: 0;
   margin: 0;
@@ -113,7 +113,7 @@ body {
   padding: 0;
 }
 '''
-    IMAGE_TYPES = {'jpeg': 'image/jpeg', 'jpg': 'image/jpeg', 'png': 'image/png', 'svg': 'image/svg+xml'}
+    image_types = {'jpeg': 'image/jpeg', 'jpg': 'image/jpeg', 'png': 'image/png', 'svg': 'image/svg+xml'}
 
     def image2xhtml(imgfile, width, height, title, epubtype='bodymatter', lang='en'):
         content = f'''<?xml version="1.0" encoding="utf-8"?>
@@ -133,20 +133,20 @@ body {
         return content
 
     def create_opf(title, author, bookId, imageFiles):
-        package_attributes = {'xmlns': NAMESPACES['OPF'], 'unique-identifier': 'bookId', 'version': '3.0',
+        package_attributes = {'xmlns': namespaces['OPF'], 'unique-identifier': 'bookId', 'version': '3.0',
                               'prefix': 'rendition: http://www.idpf.org/vocab/rendition/#', 'dir': direction}
-        nsmap = {'dc': NAMESPACES['DC'], 'opf': NAMESPACES['OPF']}
+        nsmap = {'dc': namespaces['DC'], 'opf': namespaces['OPF']}
         root = etree.Element('package', package_attributes)
         metadata = etree.SubElement(root, 'metadata', nsmap=nsmap)
         etree.SubElement(metadata, 'meta', {'property': 'dcterms:modified'}).text = datetime.datetime.now().strftime(
             '%Y-%m-%dT%H:%M:%SZ')
-        etree.SubElement(metadata, '{' + NAMESPACES['DC'] + '}identifier', {'id': 'bookId'}).text = bookId
-        etree.SubElement(metadata, '{' + NAMESPACES['DC'] + '}title').text = title
-        etree.SubElement(metadata, '{' + NAMESPACES['DC'] + '}creator', {'id': 'creator'}).text = author
+        etree.SubElement(metadata, '{' + namespaces['DC'] + '}identifier', {'id': 'bookId'}).text = bookId
+        etree.SubElement(metadata, '{' + namespaces['DC'] + '}title').text = title
+        etree.SubElement(metadata, '{' + namespaces['DC'] + '}creator', {'id': 'creator'}).text = author
         etree.SubElement(metadata, 'meta',
                          {'refines': '#creator', 'property': 'role', 'scheme': 'marc:relators'}).text = 'aut'
-        etree.SubElement(metadata, '{' + NAMESPACES['DC'] + '}language').text = 'en'
-        etree.SubElement(metadata, 'meta', {'name': 'cover', 'content': 'img-' + UID_FORMAT.format(0)})
+        etree.SubElement(metadata, '{' + namespaces['DC'] + '}language').text = 'en'
+        etree.SubElement(metadata, 'meta', {'name': 'cover', 'content': 'img-' + uid_format.format(0)})
         etree.SubElement(metadata, 'meta', {'property': 'rendition:layout'}).text = 'pre-paginated'
         etree.SubElement(metadata, 'meta', {'property': 'rendition:orientation'}).text = 'portrait'
         etree.SubElement(metadata, 'meta', {'property': 'rendition:spread'}).text = 'landscape'
@@ -155,9 +155,9 @@ body {
         manifest = etree.SubElement(root, 'manifest')
         etree.SubElement(manifest, 'item', {'href': 'imagestyle.css', 'id': 'imagestyle', 'media-type': 'text/css'})
         for i, img in enumerate(imageFiles):
-            uid = UID_FORMAT.format(i)
+            uid = uid_format.format(i)
             ext = os.path.splitext(img)[1][1:]
-            imgattrs = {'href': f'images/page-{uid}.{ext}', 'id': f'img-{uid}', 'media-type': IMAGE_TYPES[ext]}
+            imgattrs = {'href': f'images/page-{uid}.{ext}', 'id': f'img-{uid}', 'media-type': image_types[ext]}
             if i == 0:
                 imgattrs['properties'] = 'cover-image'
             etree.SubElement(manifest, 'item', imgattrs)
@@ -170,7 +170,7 @@ body {
                          {'href': 'toc.xhtml', 'id': 'toc', 'media-type': 'application/xhtml+xml', 'properties': 'nav'})
         spine = etree.SubElement(root, 'spine', {'toc': 'ncxtoc', 'page-progression-direction': direction})
         for i, img in enumerate(imageFiles):
-            uid = UID_FORMAT.format(i)
+            uid = uid_format.format(i)
             props = 'page-spread-left' if (i % 2 == 0 and direction == 'ltr') or (
                     i % 2 != 0 and direction == 'rtl') else 'page-spread-right'
             etree.SubElement(spine, 'itemref', {'idref': f'page-{uid}', 'properties': props})
@@ -200,7 +200,7 @@ body {
 </ncx:ncx>'''
 
     def create_nav(title, page_count):
-        pages = [f'          <li><a href="page-{UID_FORMAT.format(i)}.xhtml">{i}</a></li>' for i in range(page_count)]
+        pages = [f'          <li><a href="page-{uid_format.format(i)}.xhtml">{i}</a></li>' for i in range(page_count)]
         pages.pop(0)
         return f'''<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html>
@@ -240,11 +240,11 @@ body {
         return sorted(filenames,
                       key=lambda f: (extract_parts(f)[0], -extract_parts(f)[1] if reverse else extract_parts(f)[1]))
 
-    imageFiles = sort_files([f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))
-                             and os.path.splitext(f)[1][1:] in IMAGE_TYPES])
+    image_files = sort_files([f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))
+                             and os.path.splitext(f)[1][1:] in image_types])
 
-    if len(imageFiles) < 1:
-        print('Too few images:', len(imageFiles))
+    if len(image_files) < 1:
+        print('Too few images:', len(image_files))
         return
 
     prev_compression = zipfile.zlib.Z_DEFAULT_COMPRESSION
@@ -252,15 +252,15 @@ body {
 
     output_zip = zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED)
     output_zip.writestr('mimetype', 'application/epub+zip', compress_type=zipfile.ZIP_STORED)
-    output_zip.writestr(CONTAINER_PATH, CONTAINER_XML)
-    output_zip.writestr(IBOOKS_DISPLAY_OPTIONS_PATH, IBOOKS_DISPLAY_OPTIONS_XML)
-    output_zip.writestr('OEBPS/content.opf', create_opf(title, author, f'urn:uuid:{uuid4()}', imageFiles))
+    output_zip.writestr(container_path, container_xml)
+    output_zip.writestr(ibooks_display_options_path, ibooks_display_options_xml)
+    output_zip.writestr('OEBPS/content.opf', create_opf(title, author, f'urn:uuid:{uuid4()}', image_files))
     output_zip.writestr('OEBPS/toc.ncx', create_ncx(title, author, f'urn:uuid:{uuid4()}'))
-    output_zip.writestr('OEBPS/toc.xhtml', create_nav(title, len(imageFiles)))
-    output_zip.writestr('OEBPS/imagestyle.css', IMAGESTYLE_CSS)
+    output_zip.writestr('OEBPS/toc.xhtml', create_nav(title, len(image_files)))
+    output_zip.writestr('OEBPS/imagestyle.css', imagestyle_css)
 
-    for i, img in enumerate(imageFiles):
-        uid = UID_FORMAT.format(i)
+    for i, img in enumerate(image_files):
+        uid = uid_format.format(i)
         page_title = 'Cover' if i == 0 else f'Page {i}'
         epubtype = 'cover' if i == 0 else 'bodymatter'
         ext = os.path.splitext(img)[1][1:]
