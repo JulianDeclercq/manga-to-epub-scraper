@@ -54,8 +54,10 @@ def download_images_from_url(url, directory):
                 img_converted_path = os.path.splitext(img_path)[0] + '.jpg'
 
                 # Use ImageMagick to convert the image from PNG to JPG
-                result = subprocess.run(['magick', 'convert', img_path, img_converted_path], capture_output=True,
-                                        text=True)
+                result = subprocess.run(
+                    ['magick', 'convert', img_path, '-quality', '70', img_converted_path],
+                    capture_output=True, text=True
+                )
 
                 if result.returncode == 0:
                     # Remove the original PNG file
