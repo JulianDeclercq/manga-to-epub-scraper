@@ -15,7 +15,7 @@ As the repository name suggest, I plan to make this script more generic in the c
 
 #### Python Packages
 ```bash
-pip install requests beautifulsoup4 lxml imagesize
+python3 -m pip install requests beautifulsoup4 lxml imagesize
 ```
 
 #### ImageMagick
