@@ -228,6 +228,7 @@ body {
     def create_nav(title, page_count):
         pages = [f'          <li><a href="page-{uid_format.format(i)}.xhtml">{i}</a></li>' for i in range(page_count)]
         pages.pop(0)
+        pages_string = '\n'.join(pages)
         return f'''<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en">
@@ -240,7 +241,7 @@ body {
       <nav epub:type="toc" id="toc">
         <ol>
           <li epub:type="chapter"><a href="page-000.xhtml">{escape(title)}</a></li>
-{'\n'.join(pages)}
+{pages_string}
         </ol>
       </nav>
     </section>
