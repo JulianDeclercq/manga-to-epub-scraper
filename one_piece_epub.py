@@ -325,14 +325,15 @@ def main():
         config['metadata'] = {}
         config['metadata']['Author'] = 'unknown'
         config['metadata']['Title'] = 'unknown'
-        config['metadata']['Direction'] = 'ltr'
+        config['settings'] = {}
+        config['settings']['Direction'] = 'ltr'
         with open(config_path_name, 'w') as configfile:
             config.write(configfile)
 
     config.read(config_path)
     author = config['metadata']['author']
     title = config['metadata']['title']
-    direction = config['metadata']['direction']
+    direction = config['settings']['direction']
 
     if direction not in ['ltr', 'rtl']:
         print(f'Invalid direction {direction} in config, exiting..')
