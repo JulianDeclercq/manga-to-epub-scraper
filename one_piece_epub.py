@@ -343,6 +343,15 @@ def main():
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
+    while True:
+        confirmation = input(f'Current config: author = {author}, title = {title}, direction = {direction}, '
+                             f'continue? (Y/N)\n').strip().lower()
+
+        if confirmation == 'y':
+            break
+        else:
+            return
+
     for chapter in range(args.start_chapter, args.end_chapter + 1):
         print(f"Scraping images for chapter {chapter}...", flush=True)
         scrape_images(chapter)
