@@ -10,6 +10,8 @@ from uuid import uuid4
 import datetime
 import zipfile
 import imagesize
+import configparser
+from pathlib import Path
 
 
 # Function to download images from a given URL
@@ -308,10 +310,33 @@ def main():
         description='Download, process, and convert One Piece Digital Colored Comics chapters into EPUB format.')
     parser.add_argument('start_chapter', type=int, help='The starting chapter number (inclusive)')
     parser.add_argument('end_chapter', type=int, help='The ending chapter number (inclusive)')
-    parser.add_argument('-d', '--dir', choices=['ltr', 'rtl'], default='rtl',
-                        help='The direction for sorting and processing images (default: rtl)')
+    # parser.add_argument('-d', '--dir', choices=['ltr', 'rtl'], default='rtl',
+    #                     help='The direction for sorting and processing images (default: rtl)')
 
     args = parser.parse_args()
+
+    config_path_name = 'config.ini'
+    config_path = Path(config_path_name)
+    config = configparser.ConfigParser()
+
+    if not config_path.exists():
+        # Create config file
+        print('config does not exist, initializing..')
+        config['metadata'] = {}
+        config['metadata']['Author'] = 'unknown'
+        config['metadata']['Title'] = 'unknown'
+        config['metadata']['Direction'] = 'ltr'
+        with open(config_path_name, 'w') as configfile:
+            config.write(configfile)
+
+    config.read(config_path)
+    author = config['metadata']['author']
+    title = config['metadata']['title']
+    direction = config['metadata']['direction']
+
+    if direction not in ['ltr', 'rtl']:
+        print(f'Invalid direction {direction} in config, exiting..')
+        return
 
     output_dir = 'output'
     if not os.path.exists(output_dir):
@@ -324,11 +349,8 @@ def main():
         print(f"Processing images for chapter {chapter}...", flush=True)
         split_landscape_images(directory)
 
-        title = f"One Piece Colored {chapter}"
-        author = "Eiichiro Oda"
-
-        output_file = os.path.join(output_dir, f"one_piece_colored_{chapter}.epub")
-        create_epub(directory, output_file, title, author, args.dir)
+        output_file = os.path.join(output_dir, f"{title}_{chapter}.epub")
+        create_epub(directory, output_file, title, author, direction)
 
 
 if __name__ == "__main__":
