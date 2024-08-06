@@ -33,7 +33,7 @@ brew install imagemagick
 
 Run the script with the following command:
 ```bash
-python one_piece_epub.py <start_chapter> <end_chapter> [-d <direction>]
+python3 one_piece_epub.py <start_chapter> <end_chapter> [-d <direction>]
 ```
 
 - `<start_chapter>`: The starting chapter number (inclusive).
@@ -42,14 +42,14 @@ python one_piece_epub.py <start_chapter> <end_chapter> [-d <direction>]
 
 Example:
 ```bash
-python one_piece_epub.py 100 105 -d rtl
+python3 one_piece_epub.py 100 105 -d rtl
 ```
 
 This will download chapters 100 to 105, process the images with right-to-left sorting, and create EPUB files in the `output` directory.
 
 Another example:
 ```bash
-python one_piece_epub.py 100 105 -d ltr
+python3 one_piece_epub.py 100 105 -d ltr
 ```
 
 This will download chapters 100 to 105, process the images with left-to-right sorting, and create EPUB files in the `output` directory.
