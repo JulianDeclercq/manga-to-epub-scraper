@@ -34,9 +34,11 @@ def download_images_from_url(url, directory):
         img_url = img['src']
 
         # Remove potential broken query parameters from the URL
-        img_url = img_url.split('?')[0]
+        img_url = img_url.split('?')[0].strip()
 
-        if img_url.endswith(('.jpg', '.jpeg', '.png')):
+        file_extension = os.path.splitext(img_url)[1].lower()
+
+        if file_extension in ['.jpg', '.jpeg', '.png']:
             # Get the image file name
             img_name = os.path.basename(img_url)
             img_path = os.path.join(directory, img_name)
@@ -47,7 +49,8 @@ def download_images_from_url(url, directory):
                 handler.write(img_data)
 
             # Convert .png to .jpg for file size and performance on ereader
-            if img_url.endswith('.png'):
+
+            if file_extension == '.png':
                 has_pngs = True
 
                 # Generate the converted image path
