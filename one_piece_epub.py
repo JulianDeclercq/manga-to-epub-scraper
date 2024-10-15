@@ -77,7 +77,7 @@ def download_images_from_url(url, directory):
 # Function to scrape and download images
 def scrape_images(chapter):
     base_url = "https://ww10.readonepiece.com/chapter/one-piece-digital-colored-comics-chapter-"
-    url = f"{base_url}{chapter}/"
+    url = f"{base_url}{chapter:03}/"
     directory = f"scraped/one-piece-colored-{chapter}"
     print(f"Downloading images for chapter {chapter}...")
     download_images_from_url(url, directory)
