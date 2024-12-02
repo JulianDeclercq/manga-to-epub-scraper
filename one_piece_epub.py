@@ -262,10 +262,19 @@ body {
         return -1, -1  # Use -1, -1 for filenames that don't match the pattern
 
     # Function to sort the filenames
-    def sort_files(filenames):
+    def sort_files(filenames, direction='ltr'):
+        print('before sort:', filenames)
         reverse = direction == 'rtl'
-        return sorted(filenames,
-                      key=lambda f: (extract_parts(f)[0], -extract_parts(f)[1] if reverse else extract_parts(f)[1]))
+
+        def sort_key(filename):
+            import re
+            # Extract the numerical and alphabetical parts
+            match = re.match(r"(\d+)([a-z]?)\.jpg", filename)
+            number = int(match.group(1))
+            letter = match.group(2)
+            return number, letter  # Sort by number, then by letter
+
+        return sorted(filenames, key=sort_key, reverse=reverse)
 
     image_files = sort_files([f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))
                               and os.path.splitext(f)[1][1:] in image_types])
@@ -318,16 +327,17 @@ def main():
         os.makedirs(output_dir)
 
     for chapter in range(args.start_chapter, args.end_chapter + 1):
-        print(f"Scraping images for chapter {chapter}...", flush=True)
-        scrape_images(chapter)
-        directory = f"scraped/one-piece-colored-{chapter}"
-        print(f"Processing images for chapter {chapter}...", flush=True)
-        split_landscape_images(directory)
+        # print(f"Scraping images for chapter {chapter}...", flush=True)
+        # scrape_images(chapter)
+        # directory = f"scraped/one-piece-colored-{chapter}"
+        # print(f"Processing images for chapter {chapter}...", flush=True)
+        # split_landscape_images(directory)
 
         title = f"One Piece Colored {chapter}"
         author = "Eiichiro Oda"
 
         output_file = os.path.join(output_dir, f"one_piece_colored_{chapter}.epub")
+        directory = f"scraped/one-piece-colored-{chapter}"
         create_epub(directory, output_file, title, author, args.dir)
 
 
