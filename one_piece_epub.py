@@ -269,7 +269,7 @@ body {
         def sort_key(filename):
             import re
             # Extract the numerical and alphabetical parts
-            match = re.match(r"(\d+)([a-z]?)\.jpg", filename)
+            match = re.match(r"(\d+)([a-z]?)\.(jpg|jpeg|png)", filename)
             number = int(match.group(1))
             letter = match.group(2)
             return number, letter  # Sort by number, then by letter
